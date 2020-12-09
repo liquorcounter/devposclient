@@ -1,0 +1,160 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
+*{
+    margin:0px ;
+   font-family: 'Montserrat', sans-serif !important;
+}
+
+
+header{
+    background: #243a51;
+    padding: 5px;
+}
+
+header h6{
+    color: #fff;
+    font-size: 2vw;
+    padding: 10px;
+    display: inline-block;
+}
+
+.date{
+    float: right;
+    padding: 10px;
+}
+.footer{
+    
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+    
+    background: #243a51;
+    color:#fff;
+
+}
+.shorcutKeys{
+   /* background: #243a51;*/
+    width: 100%;
+}
+
+.example-form {
+    min-width: 150px;
+    max-width: 500px;
+    width: 100%;
+  }
+  
+  .example-full-width {
+    width: 100%;
+  }
+  
+  .example-option-img {
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  
+  [dir='rtl'] .example-option-img {
+    margin-right: 0;
+    margin-left: 8px;
+  }
+  .loadingmodal{
+    width:100%;
+    height: 100%;
+    position: fixed;
+    top:0px;
+    left: 0px;
+    z-index: 100;
+    background: rgba(7, 7, 7, 0.502);
+    text-align: center;
+    display: table;
+  } 
+
+  .loadingmodal .modal-content{
+    display: inline-block;
+    margin-top: 10%;
+    vertical-align: middle;
+    width: auto;
+    width: 30%;
+  
+  }
+  .loadingmodal h1{
+    font-weight: bold;
+  }
+  .billmain span{
+    text-align: center;
+    box-sizing: border-box;
+    background-color: #243a51;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    white-space: nowrap;
+    font-size: 12px;
+    text-align: center;
+    padding: 8px;
+    color: #fff;
+  }
+.billDetails span{
+    padding: 8px;
+}
+  details summary::-webkit-details-marker {
+    display:none;
+  }
+.sideright{
+    background: #f3f3f3;
+  padding: 7%;
+  text-align: left;
+}
+
+.mycard{
+    padding: 6%;
+    margin-bottom: 2%;
+    
+    background: #fff;
+    border: 1px solid #33333342;
+    border-radius: 0.28em;
+}
+
+.mycard b{
+  display: inline;
+}
+
+  
+.btn-default{
+  background:  #f3f3f3 !important;
+}
+
+
+tbody {
+  display:block;
+  height:calc( 100vh - 40vh );
+  overflow:auto;
+}
+thead, tbody tr {
+  display:table;
+  width:100%;
+  table-layout:fixed;/* even columns width , fix width of table too*/
+}
+thead {
+  width: calc( 100% - 1em )/* scrollbar is average 1em/16px width, remove it from thead width */
+}
+tr:nth-child(even) {background-color: #f2f2f2;}
+
+._billDetails{
+  display:block;
+  height:calc( 100vh - 40vh );
+  overflow:auto;
+}
+
+.red{
+  color: red;
+}
+.loadingmodal h2{
+  display: table-cell;
+  color: white;
+  
+vertical-align: middle;
+
+}
+.posTable td{
+  font-weight: bold;
+  padding: 0.4em ;
+}

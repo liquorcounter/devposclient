@@ -1,0 +1,44 @@
+<div class="container-fluid" style="text-align: left;">
+  <div>
+   <div class="content-header">
+      <b>TAB</b>
+   </div>
+  <h4>TAB Entry - {{tabStatus}}</h4>
+  
+</div>
+<div>
+  <div class="content-header">
+     <b>IP</b>
+  </div>
+ <h4>{{nodeIp}}</h4>
+ 
+</div>
+
+<div>
+  <div class="content-header">
+    <b>TERMINALS</b>
+ </div>
+    <div>
+      
+      <li style="padding: 10px;" *ngFor="let item of terminals;">{{item.tid}}<span *ngIf ="item.status==1" style="background: green;color: #fff;padding: 2px;margin-left: 10px;">online</span><span *ngIf ="item.status==0" style="background: red;color: #fff;padding: 2px;margin-left: 10px;">offline</span></li>
+      
+    
+    </div>
+
+</div>
+
+<div>
+  <div class="content-header">
+    <b>CARD</b>
+ </div>
+    <div>
+      <h4>Do you Charge for Card?</h4>
+      <input class="form-control" type="number" [(ngModel)]= "card" style="display: inline;width: auto;"><span>%</span>
+      <button class="btn btn-danger" style="float: right;" (click)=updateSettings()>UPDATE</button>
+    </div>
+
+</div>
+
+
+
+</div>

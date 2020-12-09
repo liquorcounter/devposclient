@@ -1,0 +1,63 @@
+<div class="stock">
+    <br>
+    <div class="row">
+        <div class="col-lg-3">
+            <!-- <button type="button" class="btn btn-danger"  (click)="updateInvoice()">UPDATE INVOICE</button>
+            <button type="button" class="btn btn-danger"  (click)="updateOpening()">UPDATE OPENING</button>
+            <button type="button" class="btn btn-danger"  (click)="submitSale()">SUBMIT SALE</button> -->
+        </div>
+        <div class="col-lg-6">
+            <input type="text" [(ngModel)]="searchstock" class="form-control" placeholder="Search Product" >
+        </div>
+        <div class="col-lg-3">
+            <b style="float: right;">Date : {{saleDate}}</b>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-lg-3"><button type="button" class="btn btn-danger"  (click)="updateInvoice()">SYNC INVOICE</button></div>
+        <div class="col-lg-1"></div>
+        <div class="col-lg-3"> <button type="button" class="btn btn-danger"  (click)="updateOpening()">SYNC OPENING</button></div>
+        <div class="col-lg-1"></div>
+        <div class="col-lg-3"><button type="button" class="btn btn-danger"  (click)="submitSale()">CLOSE SALE</button></div>
+        <div class="col-lg-1"></div>
+    </div>
+    <br>
+    <table class="table">
+    <thead>
+      <tr style="background: #243a51;color:#fff;font-size: 12px;font-weight: normal;">
+        <th style="width: 5%;">S.No</th>
+        <th style="width: 10%;">BARCODE</th>
+        <th style="width: 25%;">NAME</th>
+        <th style="width: 10%;">PT</th>
+        <th style="width: 5%;">OPENING</th>
+        <th style="width: 5%;">RECIEVED</th>
+        <th style="width: 5%;">CLOSING</th>
+        <th style="width: 10%;">SALE</th>
+        <th style="width: 10%;">MRP</th>
+        <th style="width: 15%;">PRICE</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr  *ngFor="let productitem of stockItems| appFilter : {brandName : searchstock,barCode : searchstock}; let i = index" [ngClass]="{ 'red': productitem.closing<0 || productitem.totalSale<0 }">
+        <td style="width: 5%;">{{i+1}}</td>
+        <td style="width: 10%;">{{productitem.barCode}}</td>
+        <td style="width: 25%;">{{productitem.brandName}}</td>
+        <td style="width: 10%;">{{productitem.packType}}</td>
+        <td style="width: 5%;">{{productitem.opening}}</td>
+        <td style="width: 5%;">{{productitem.received}}</td>
+        <td style="width: 5%;"><input   value="{{productitem.closing}}" (input)="onChangeQty($event.target.value,productitem)"/></td>
+        <td style="width: 10%;">{{productitem.totalSale}}</td>
+        <td style="width: 10%;">{{productitem.unitPrice}}</td>
+        <td style="width: 15%;">{{indianRupeeFormat(productitem.totalPrice)}}</td>
+      </tr>
+     
+    </tbody>
+  </table>
+  </div>
+
+  <!-- loading Modal -->
+<div class="loadingmodal" *ngIf=show>
+    <h2>{{alertText}}</h2>
+    
+    </div>

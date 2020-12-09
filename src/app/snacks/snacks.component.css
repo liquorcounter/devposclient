@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
+*{
+    margin:0px ;
+   font-family: 'Montserrat', sans-serif !important;
+}
+
+
+header{
+    background: #243a51;
+    padding: 5px;
+}
+
+header h6{
+    color: #fff;
+    font-size: 2vw;
+    padding: 10px;
+    display: inline-block;
+}
+
+tbody {
+    display:block;
+    height:calc( 100vh - 50vh );
+    overflow:auto;
+  }
+  thead, tbody tr {
+    display:table;
+    width:100%;
+    table-layout:fixed;/* even columns width , fix width of table too*/
+  }
+  thead {
+    width: calc( 100% - 1em )/* scrollbar is average 1em/16px width, remove it from thead width */
+  }
+  tr:nth-child(even) {background-color: #f2f2f2;}
+  

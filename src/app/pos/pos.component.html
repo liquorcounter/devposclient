@@ -1,0 +1,589 @@
+<header>
+    <h6>LC - POS</h6><h3 style="display: inline-block;color: #fff;"> [{{shopName}}]</h3>
+    <a class="nav-link"  style="float: right;font-size: 1.5vw;padding: 0px;" [matMenuTriggerFor]="menu"><img src="assets/bottle.png" style="padding-right:5px;" /></a>
+   
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="requestUsb()">
+        <img src="assets/printer.png"  title ="" />
+        <span *ngIf = status style="color: green;padding: 0px 10px">ENABLED</span>
+        <span *ngIf = !status style="color: red;padding: 0px 10px">DISABLED</span>
+      </button>
+      <button mat-menu-item (click)="openSnacksModal(true)">
+        <img src="assets/snack.png"  title ="" />
+        <span  style="color: #000;padding: 0px 10px">SNACKS</span>
+      </button>
+      <button mat-menu-item   (click)="openSettingsModal(true)">
+        <img src="assets/settings.png"  title ="" />
+        <span  style="color: #000;padding: 0px 10px">SETTINGS</span>
+      </button>
+      <button mat-menu-item   (click)="updateTerminalStatus()">
+        <img src="assets/logout.png"  title ="" />
+        <span  style="color: #000;padding: 0px 10px">LOGOUT</span>
+      </button>
+    </mat-menu>
+    
+    <h6 style="float: right;font-size: 1.3em;">Hey! {{terminalName}}</h6>
+    
+    
+   
+   
+   
+     
+  </header>
+  
+  <section>
+      <div class="row">
+          <div class="col-md-3">
+            <b>Bill No : {{mbill.date | date:'ddMMyyyy'}}{{mbill.billID}}</b>
+            <input [(ngModel)]="barCodeFromScanner" #barCodeInput (focus)="barCodeInputElementFocus = true" (blur)="barCodeInputElementFocus = false"/>
+          </div>
+          <div class="col-md-6">
+            <form class="example-form">
+                <mat-form-field class="example-full-width">
+                  <input matInput
+                         placeholder="SEARCH PRODUCT"
+                         aria-label="SEARCH PRODUCT"
+                         [matAutocomplete]="auto"
+                         [formControl]="stateCtrl"
+                         #searchInput
+                         >
+                  <mat-autocomplete #auto="matAutocomplete" >
+                    <mat-option *ngFor="let product of filteredStates | async" [value]="product.brandName"  (onSelectionChange)="onSelectionChangeProduct(product,$event)" >
+                      <!--<img class="example-option-img" aria-hidden [src]="state.flag" height="25">-->
+                      <span>{{product.brandName}}</span> -
+                      <span>{{product.packType}}</span>
+                      <!-- <button style="float: right;margin: 3px;" type="button" class="btn btn-primary" (click)="addProductToBill(product)">ADD</button> -->
+
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              
+                <br>
+              
+                
+              </form>
+            </div>
+          <div class="col-md-3"><b class="date"> {{date | date:'dd-MMM-yyyy'}}</b></div>
+      </div>
+      
+  </section>
+  <div class="container-fluid">
+    <b *ngIf=barCodeInputElementFocus style="color:#00b26f">*Ready to scan</b>
+    <b *ngIf=!barCodeInputElementFocus style="color:#ff0505">*Press F8 to start scan</b>
+  <table class="table posTable" >
+    <thead>
+      <tr style="background: #243a51;color:#fff">
+        <th>S.No</th>
+        <th  style="width: 15%;"> BARCODE</th>
+        <th  style="width: 25%;">NAME</th>
+        <th>PT</th>
+        <th>MRP</th>
+        <th style="width: 15%;">QTY</th>
+        <th>TOTAL</th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- <div style="text-align: center;width: 100%;" *ngIf =loaderCart>
+      <h2>!!!  ADD PRODUCT  !!!</h2>
+      <img src="assets/wine.gif" style="width:15%;" />
+    </div> -->
+      
+      <tr #printDiv *ngFor="let item of billProducts; let i = index" [style.background-color]="item.highlight ? 'rgb(187 237 252)' : null" (click)="changeHighlight(item)">
+        <td>{{i+1}}</td>
+        <td style="width: 15%;">
+          <span *ngFor="let subBarcode of (item.barCode.split(','))">
+            {{ subBarcode }} 
+          </span>
+          </td>
+        <td style="width: 25%;">{{item.brandName}}</td>
+        <td>{{item.packType}}</td>
+        <td>{{item.unitPrice}}</td>
+        <td style="width: 15%;"><input class="" type="number" value="{{item.totalSale}}" (input)="onChangeQty($event.target.value,item)" style="width: 100px;"></td>
+        <td>{{indianRupeeFormat(item.totalPrice)}}</td>
+        <td><img src="assets/plus.png" style="padding-right:5px;" (click)="onChangeQty(item.totalSale+1,item)"/></td>
+        <td> <img src="assets/minus.png" style="padding-right:5px;" (click)="onChangeQty(item.totalSale-1,item)"></td>
+          <td><img src="assets/multiply.png" style="padding-right:5px;"(click)="removeProduct(item)"></td>
+      </tr>
+     
+    </tbody>
+  </table>
+  </div>
+  
+  <div class="footer">
+    <hr>
+   
+     <div style="padding-right: 5%;">
+        <div style="width: 100%; background : #243a51;" >
+          <button (click)="holdBillsPopup = true" class="btn btn-danger" *ngIf=holdItemsIcon><img src="assets/holdbill.png" /><b style="padding-left: 3px;">{{indianRupeeFormat(holdItemsSum)}} - HOLD BILLS</b></button>
+          
+          <h2  style="display: inline-block;float:right;padding-left: 5%;font-weight: bold;">QTY : {{totalBillQty}}</h2>
+          <h2  style="display: inline-block;float:right;font-weight: bold;background: #eefe00;color: red;padding: 0px 5px;font-size: 23px ;">{{indianRupeeFormat(totalBill - discountOnBill)}}</h2>
+          <h2  style="display: inline-block;float:right;padding-left: 5%;font-weight: bold;">GRAND TOTAL : </h2>
+          <input class="" type="number"  style="float:right;margin:5px;font-weight: bold;" [(ngModel)]="discountOnBill" #discountInput/>
+          <h2  style="display: inline-block;float:right;padding-left: 5%;">Discount : </h2>
+          <h2  style="display: inline-block;float:right;padding-left: 5%;font-weight: bold;">TOTAL : {{indianRupeeFormat(totalBill)}}</h2>
+          
+          
+        </div>
+       
+     </div>
+     <br>
+     <div class="row shorcutKeys">
+      <div class="col">
+        <div style="background:#ff80ff;padding: 10px;margin: 10px;width: 100%; text-align: center;color:#fff" (click)="showUPIpopup()">
+          <b>UPI</b><br>
+          <b>(F1)</b>
+         
+        </div>
+      </div>
+        <div class="col">
+          <div style="background:#00b26f;padding: 10px;margin: 10px;width: 100%; text-align: center;color:#fff" (click)="showCashPopup()">
+            <b>CASH</b><br>
+            <b>(F2)</b>
+          </div>
+        </div>
+        <div class="col">
+          <div style="background:#ff8300;padding: 10px;margin: 10px;width: 100%; text-align: center;color:#fff" (click)="showCardpopup()">
+            <b>CARD</b><br>
+            <b>(F3)</b>
+           
+          </div>
+        </div>
+        
+        <div class="col">
+          <div style="background:#00b5e9;padding: 10px;margin: 10px;width: 100%; text-align: center;color:#fff" (click)="showCardCashPopup()">
+            <b>CASH & CARD</b><br>
+            <b>(F4)</b>
+          </div>
+        </div>
+        <div class="col">
+          <div style="background:#e59866 ;padding: 10px;margin: 10px;width: 100%; text-align: center;color:#fff" (click)="showCreditPopup()">
+            <b>CREDIT</b><br>
+            <b>(F9)</b>
+          </div>
+        </div>
+        <div class="col">
+          <div style="background:#fa4251;padding: 10px;margin: 10px;width: 100%; text-align: center;color:#fff" (click)="refresh()">
+            <b>NEW BILL</b><br>
+            <b>(F6)</b>
+          </div>
+        </div>
+        <div class="col">
+          <div style="background:#abb2b9 ;padding: 10px;margin: 10px;width: 100%; text-align: center;color:#fff" (click)="showAllBillsPopup()">
+            <b>BILLS</b><br>
+            <b>(F7)</b>
+          </div>
+        </div>
+     </div>
+  </div>
+
+  <!-- CASH POPUP -->
+<div class="loadingmodal" *ngIf=showCash>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 style="color: #000;">CASH</h2>
+    </div>
+    <div class="modal-body">
+      <h1>TOTAL : {{indianRupeeFormat(totalBill - discountOnBill)}}</h1>
+      <input type="number" [(ngModel)]="change" appAutofocus #changeInput />
+      <h4>Return Amt : {{indianRupeeFormat(change - (totalBill-discountOnBill))}}</h4>
+     
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" style="float: left;position: absolute;left: 3%;" (click)="closeAllPopups()">CANCEL</button>
+      <button type="button" class="btn btn-primary" style="margin-right: 5px;"(click)="saveBill((totalBill-discountOnBill),0,0,0,'',true)">PRINT(P)</button>
+      <button type="button" class="btn btn-success"  (click)="saveBill((totalBill-discountOnBill),0,0,0,'',false)">CONFIRM</button>
+    </div>
+  </div>
+  
+  </div> 
+
+  <!-- CARD POPUP -->
+<div class="loadingmodal" *ngIf=showCard>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 style="color: #000;">CARD</h2>
+    </div>
+    <div class="modal-body">
+      <h1>TOTAL : {{indianRupeeFormat((totalBill-discountOnBill) + ((cardCharge/100)*(totalBill-discountOnBill)))}}</h1>
+      
+      <h4>( Bill : {{indianRupeeFormat(totalBill-discountOnBill)}} + {{cardCharge}}%)</h4>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" style="float: left;position: absolute;left: 3%;" (click)="closeAllPopups()">CANCEL</button>
+      <button type="button" class="btn btn-primary" style="margin-right: 5px;"(click)="saveBill(0,(totalBill-discountOnBill) + ((cardCharge/100)*(totalBill-discountOnBill)),0,0,'',true)">PRINT(P)</button>
+      <button type="button" class="btn btn-success" (click)="saveBill(0,(totalBill-discountOnBill) + ((cardCharge/100)*(totalBill-discountOnBill)),0,0,'',false)" >CONFIRM</button>
+    </div>
+  </div>
+  
+  </div>
+
+  <!-- CASH & CARD POPUP -->
+<div class="loadingmodal" *ngIf=showCardCash>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 style="color: #000;">CASH & CARD</h2>
+    </div>
+    <div class="modal-body">
+      <h1>TOTAL : {{indianRupeeFormat(totalBill-discountOnBill)}}</h1>
+      
+      <label>CASH  </label><pre style="display: inline;"> : </pre>
+        <input type="number" [(ngModel)]="cash" appAutofocus #cashcardInput /><br><br>
+      <label>CARD </label><pre style="display: inline;"> : </pre>
+      <h2 style="display: inline;color: #000;" [(ngModel)]="cardcash">{{indianRupeeFormat((totalBill- discountOnBill - cash) + ((totalBill-discountOnBill - cash)*(cardCharge/100)))}}</h2>
+        
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" style="float: left;position: absolute;left: 3%;" (click)="closeAllPopups()">CANCEL</button>
+      <button type="button" class="btn btn-primary" style="margin-right: 5px;"(click)="saveBill(cash,((totalBill-discountOnBill) - cash) + (((totalBill-discountOnBill) - cash)*(cardCharge/100)),0,0,'',true)">PRINT(P)</button>
+      <button type="button" class="btn btn-success" (click)="saveBill(cash,((totalBill-discountOnBill) - cash) + (((totalBill-discountOnBill) - cash)*(cardCharge/100)),0,0,'',false)" >CONFIRM</button>
+    </div>
+  </div>
+  
+  </div>
+
+   <!-- CREDIT POPUP -->
+<div class="loadingmodal" *ngIf=showCredit>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 style="color: #000;" >CREDIT</h2>
+    </div>
+    <div class="modal-body">
+      <h1>TOTAL : {{indianRupeeFormat(totalBill-discountOnBill)}}</h1>
+      <label>NAME  </label><pre style="display: inline;"> : </pre>
+        <input type="text" #creditInput appAutofocus [(ngModel)]="billName"/><br><br>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" style="float: left;position: absolute;left: 3%;" (click)="closeAllPopups()">CANCEL</button>
+      <button type="button" class="btn btn-primary" style="margin-right: 5px;"(click)="saveBill(0,0,(totalBill-discountOnBill),0,billName,true)">PRINT(P)</button>
+      <button type="button" class="btn btn-success" (click)="saveBill(0,0,(totalBill-discountOnBill),0,billName,false)" >CONFIRM</button>
+    </div>
+  </div>
+  </div>
+
+  <!-- UPI POPUP -->
+<div class="loadingmodal" *ngIf=showUPI>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 style="color: #000;" >UPI</h2>
+    </div>
+    <div class="modal-body">
+      <h1>TOTAL : {{indianRupeeFormat(totalBill-discountOnBill)}}</h1>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" style="float: left;position: absolute;left: 3%;" (click)="closeAllPopups()">CANCEL</button>
+      <button type="button" class="btn btn-primary" style="margin-right: 5px;"(click)="saveBill(0,0,0,(totalBill-discountOnBill),'',true)">PRINT(P)</button>
+      <button type="button" class="btn btn-success" (click)="saveBill(0,0,0,(totalBill-discountOnBill),'',false)" >CONFIRM</button>
+    </div>
+  </div>
+  </div>
+
+  <!-- BILLS POPUP -->
+<div class="loadingmodal" *ngIf=showAllBills>
+  <div class="modal-content" style="width: 100%;margin:0px;">
+    <!-- <div class="modal-header">
+      <h2 >BILLS - {{mbill.date | date:'dd-MMM-yyyy'}}</h2>
+    </div> -->
+    <div class="modal-body">
+      <div class="row">
+         <div class="col-lg-9">
+           <div class="row">
+             <div class="col-lg-4">
+              <b style="float: left;" *ngIf=!showTodayBillsbool>{{date | date:'dd-MMM-yyyy'}}</b>
+              <mat-form-field appearance="fill" style="float: left;" *ngIf=showTodayBillsbool>
+                <mat-label >Bill Date :</mat-label> 
+               <input matInput [matDatepicker]="dp3" disabled (dateChange)="getBillsDate($event)" [ngModel]="billRetriveDate" style="color: #000;">
+               <mat-datepicker-toggle matSuffix [for]="dp3"></mat-datepicker-toggle>
+               <mat-datepicker #dp3 disabled="false" ></mat-datepicker>
+             </mat-form-field>
+             </div>
+             <div class="col-lg-4">
+              <button class="btn btn-primary btn-sm" [ngClass]="{ 'btn-primary': showTodayBillsbool,'btn-default': !showTodayBillsbool  }" style="margin:3px;" (click)="showTodayBills()">BILLS</button>
+              <button class="btn btn-primary btn-sm" style="" (click)="showCurrentStock()" [ngClass]="{ 'btn-primary': !showTodayBillsbool , 'btn-default': showTodayBillsbool}">STOCK</button>
+             </div>
+             <div class="col-lg-4">
+              <input *ngIf=showTodayBillsbool type="text" [(ngModel)]="searchbill" class="form-control" placeholder="Search Bill" style="float: right;width: fit-content;font-size: 1em;">
+              <input *ngIf=!showTodayBillsbool type="text" [(ngModel)]="searchstock" class="form-control" placeholder="Search Product" style="float: right;width: fit-content;font-size: 1em;">
+             </div>
+             
+           
+          </div>
+          <div  class="bills" *ngIf=showTodayBillsbool >
+            
+               <div class="billmain row">
+                <span class="col-lg-2">Bill No.</span>
+                <span class="col-lg-1">TIME</span>
+                <span class="col-lg-1">CASH</span>
+                <span class="col-lg-1">CARD</span>
+                <span class="col-lg-1">UPI</span>
+                <span class="col-lg-1">CREDIT</span>
+                <span class="col-lg-1">Discount</span>
+                <span class="col-lg-1">TOTAL BILL</span>
+                <span class="col-lg-1">TERMINAL</span>
+                <span class="col-lg-1"></span>
+                <span class="col-lg-1"></span>
+              </div>
+            
+              <div class="_billDetails">
+                 <h3 *ngIf="todayBills.length==0"> No Bills !!!</h3> 
+              <details *ngFor="let item of todayBills | appFilter : {searchName : searchbill}; let i = index">
+                <summary  style="border-bottom: 1px solid #e5e0e0;">
+              <div  class="row billDetails"  >
+                <span class="col-lg-2">{{item.date | date:'ddMMyyyy'}}{{item.billID}}</span>
+                <span class="col-lg-1">{{item.time | date:'HH:mm:ss'}}</span>
+                <span class="col-lg-1">{{indianRupeeFormat(item.cash)}}</span>
+                <span class="col-lg-1">{{indianRupeeFormat(item.card)}}</span>
+                <span class="col-lg-1">{{indianRupeeFormat(item.upi)}}</span>
+                <span class="col-lg-1" title="{{item.billName}}">{{indianRupeeFormat(item.credit)}}</span>
+                <span class="col-lg-1">{{indianRupeeFormat(item.discountOnBill)}}</span>
+                <span class="col-lg-1">{{indianRupeeFormat(item.totalPrice)}}</span>
+                <span class="col-lg-1">{{item.terminal}}</span>
+                  <span class="col-lg-1"><img src="assets/printer.png" (click)="printBill(item)" ></span>
+                   <span *ngIf="item.status==1 && item.date==date" class="col-lg-1"><img src="assets/multiply2.png" (click)="cancelBill(item)" title="CancelBill" ></span> 
+                  <span *ngIf="item.status==0" class="col-lg-1" style="color: red;">Cancelled</span>
+              </div>
+            </summary>
+            <table class="table">
+              <thead>
+                <tr style="background: #337ab7;color:#fff;font-size: 12px;font-weight: normal;">
+                  <th>S.No</th>
+                  <th>BAR CODE</th>
+                  <th style="width: 30%;">NAME</th>
+                  <th>PT</th>
+                  <th>MRP</th>
+                  <th>QTY</th>
+                  <th>TOTAL</th>
+                </tr>
+              </thead>
+              <tbody style="height: auto;">
+                <tr  *ngFor="let productitem of item.saleBean; let i = index">
+                  <td>{{i+1}}</td>
+                  <td style="width: 15%;">
+                    <span *ngFor="let subBarcode of (productitem.barCode.split(','))">
+                      {{ subBarcode }} 
+                    </span>
+                    </td>
+                  <!-- <td>{{productitem.barCode}}</td> -->
+                  <td style="width: 30%;">{{productitem.brandName}}</td>
+                  <td>{{productitem.packType}}</td>
+                  <td>{{productitem.unitPrice}}</td>
+                  <td>{{productitem.totalSale}}</td>
+                  <td>{{indianRupeeFormat(productitem.totalPrice)}}</td>
+                </tr>
+               
+              </tbody>
+            </table>
+            </details>
+          </div>
+          </div>
+          <div class="stock" *ngIf=!showTodayBillsbool>
+            <table class="table">
+            <thead>
+              <tr style="background: #243a51;color:#fff;font-size: 12px;font-weight: normal;">
+                <th style="width: 5%;">S.No</th>
+                <th style="width: 40%;">NAME</th>
+                <th style="width: 10%;">PT</th>
+                <th style="width: 10%;">OPENING</th>
+                <th style="width: 10%;" (click)= "oncolumnClick('closing')">CLOSING</th>
+                <th style="width: 10%;"  (click)= "oncolumnClick('totalSale')">SALE</th>
+                <th style="width: 15%;">PRICE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr  *ngFor="let productitem of stockItems | orderBy : (stockOrderBy) : 'asc' | appFilter : {brandName : searchstock}; let i = index" [ngClass]="{ 'red': productitem.closing<0 || productitem.totalSale<0 }"  >
+                <td style="width: 5%;">{{i+1}}</td>
+                <td style="width: 40%;">{{productitem.brandName}}</td>
+                <td style="width: 10%;">{{productitem.packType}}</td>
+                <td style="width: 10%;">{{productitem.opening + productitem.received}}</td>
+                <td style="width: 10%;">{{productitem.closing}}</td>
+                <td style="width: 10%;">{{productitem.totalSale}}</td>
+                <td style="width: 15%;">{{indianRupeeFormat(productitem.totalPrice)}}</td>
+              </tr>
+             
+            </tbody>
+          </table>
+          <div class="row">
+            <div class="col-lg-3"><button type="button" class="btn btn-danger"  (click)="updateInvoice()">SYNC INVOICE</button></div>
+            <div class="col-lg-1"></div>
+            <div class="col-lg-3"> <button type="button" class="btn btn-danger"  (click)="updateOpening()">SYNC OPENING</button></div>
+            <div class="col-lg-1"></div>
+            <div class="col-lg-3"><button type="button" class="btn btn-danger"  (click)="openClosingCounterModal(true)">CLOSE COUNTER</button></div>
+            <div class="col-lg-1"></div>
+        </div>
+          </div>
+          
+         </div>
+         <div class="col-lg-3">
+            <div class="sideright">
+              <div class="mycard">
+               <b>SALE</b>
+               <b style="color:red;display: inline;float:right;">{{indianRupeeFormat(totalSaleToday)}}</b>
+              </div>
+              <div class="mycard">
+                <b >UPI</b>
+                <!-- <input type="number" [(ngModel)]="totalCashToday" class="form-control"> -->
+                <b style="float:right;">{{indianRupeeFormat(totalUPIToday) }}</b>
+               </div>
+              <div class="mycard">
+                <b>CASH</b>
+                <!-- <input type="number" [(ngModel)]="totalCashToday" class="form-control"> -->
+                <b style="float:right;">{{indianRupeeFormat(totalCashToday) }}</b>
+               </div>
+               <div class="mycard">
+                <b>CARD</b>
+                <!-- <h3>{{indianRupeeFormat(totalCardToday - (totalCardToday*(cardCharge/100)).toFixed(0) ) }}</h3> -->
+                <b style="float:right;">{{indianRupeeFormat(totalCardToday) }}</b>
+               </div>
+               <div class="mycard">
+                <b>CREDIT</b>
+                <b style="float:right;">{{indianRupeeFormat(totalCreditToday)}}</b>
+               </div>
+               <div class="mycard">
+                <b>Discount</b>
+                <b style="float:right;">{{indianRupeeFormat(totalDiscountToday)}}</b>
+               </div>
+               <div class="mycard">
+                <b>SNACKS</b>
+                <b style="float:right;">{{indianRupeeFormat(totalSnacksToday)}}</b>
+               </div>
+               <div class="mycard">
+                <b>COVERS</b>
+                <b style="float:right;">{{indianRupeeFormat(totalCoversToday)}}</b>
+               </div>
+                 
+            </div>
+        </div>
+      </div>
+      
+        
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary"  (click)="closeAllPopups()">CANCEL</button>
+      <!-- <button type="button" class="btn btn-danger"  >SUBMIT TODAY SALE</button> -->
+    </div>
+  </div>
+  
+  </div>
+
+  <!-- alert popup -->
+  <div class="loadingmodal" *ngIf=showAlert>
+    <div class="modal-content">
+      <div class="modal-body">
+        <h3>{{myAlertText}}</h3>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-info" (click)="closeMyAlert()" >OK</button>
+      </div>
+    </div>
+    
+    </div>
+
+    <!-- hold bills popup -->
+  <div class="loadingmodal" *ngIf=holdBillsPopup>
+    <div class="modal-content">
+      <div class="modal-body">
+        <table class="table">
+          <thead>
+            <tr style="background: #337ab7;color:#fff;font-size: 12px;font-weight: normal;">
+              <th>S.No</th>
+              <th>Items</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody style="height: auto;">
+            <tr  *ngFor="let productitem of holdBills; let i = index" (click) = "unholdItems(i,productitem)">
+              <td>{{i+1}}</td>
+              <td style="width: 15%;">
+                 {{productitem.saleBean.length}}
+                </td>
+             
+              <td>{{indianRupeeFormat(productitem.totalPrice)}}</td>
+            </tr>
+           
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-info" (click)="closeAllPopups()" >OK</button>
+      </div>
+    </div>
+    
+    </div>
+
+    <!-- loading Modal -->
+<div class="loadingmodal" *ngIf=show>
+  <h2>{{alertText}}</h2>
+  
+  </div>
+
+  <!-- snacks popup -->
+  <div class="loadingmodal" *ngIf=openSnacksVal >
+    
+    <div class="modal-content" style="min-width: 90%;margin: 4%;">
+      <div class="modal-header">
+        <img src="assets/snack.png"  title ="" />
+        <h5  style="color: #000;padding: 0px 10px;display: inline;">SNACKS</h5>
+        <button type="button" class="close"(click)="openSnacksModal(false)">&times;</button>
+      </div>
+      <div class="modal-body">
+        <app-snacks></app-snacks>
+      </div>
+      
+    </div>
+    
+    
+    </div>
+
+    <!-- settings popup -->
+
+    <div class="loadingmodal" *ngIf=openSettingsVal >
+      <div class="modal-content" style="min-width: 50%;margin: 4%;">
+        <div class="modal-header">
+          <img src="assets/settings.png"  title ="" />
+          <h5  style="color: #000;padding: 0px 10px;display: inline;">SETTINGS</h5>
+          <button type="button" class="close"(click)="openSettingsModal(false)">&times;</button>
+        </div>
+        <div class="modal-body">
+          <app-settings></app-settings>
+        </div>
+      </div>
+      </div>
+
+      <!-- close counter popup -->
+
+    <div class="loadingmodal" *ngIf=openClosingCounterVal >
+      <div class="modal-content" style="min-width: 56%;margin: 1%;">
+        <div class="modal-header">
+          <img src="assets/settings.png"  title ="" />
+          <h3  style="color: #000;padding: 0px 10px;display: inline;">COUNTER CLOSING ON {{date | date:'dd-MMM-yyyy'}}</h3>
+          <button type="button" class="close"(click)="openClosingCounterModal(false)">&times;</button>
+        </div>
+        <app-salesubmit></app-salesubmit>
+      </div>
+      </div>
+
+      <!-- confirmation Modal for cancelling-->
+<!-- <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" >
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Confirmation!!!!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure, you want to cancelBill for <b [ngStyle]="{'color': dateColor ? 'black' : 'red' }">{{saleDate | date:'dd-MM-yyyy'}}</b>?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">CLOSE</button>
+        <button type="button" class="btn btn-primary"  (click)="postSaleData()" data-dismiss="modal" data-toggle="modal" data-target="#loadingmodal">YES</button>
+      </div>
+    </div>
+  </div>
+</div> -->

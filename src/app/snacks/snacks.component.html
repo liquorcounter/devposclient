@@ -1,0 +1,73 @@
+
+<div class="">
+   
+   
+    <div class="row">
+        
+        <div class="form-group col-lg-3">
+            <label for="barcode">BarCode:</label>
+            <input type="text" class="form-control" required [(ngModel)]="barCode">
+          </div>
+          <div class="form-group col-lg-3">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" required [(ngModel)]="name">
+           
+          </div>
+          <div class="form-group col-lg-2">
+            <label for="cp">Cost Price:</label>
+            <input type="number" class="form-control" required [(ngModel)]="costPrice">
+          </div>
+          <div class="form-group col-lg-2">
+            <label for="mrp">MRP:</label>
+            <input type="number" class="form-control"  required [(ngModel)]="mrp">
+          </div>
+          <div class="form-group col-lg-1">
+            <label for="cp">Cover:</label><br>
+            <input type="checkbox"  [(ngModel)]="cover" style="margin-top: 10px;">
+          </div>
+          <div class="form-group col-lg-1">
+            <br>
+            <button  type="submit" class="btn btn-primary"  (click)="addSnackProduct()">ADD</button>
+          </div>
+       
+    </div>
+
+    <br>
+    <table class="table posTable" >
+        <thead>
+          <tr style="background: #243a51;color:#fff">
+            <th>S.No</th>
+            <th  style="width: 15%;"> BARCODE</th>
+            <th  style="width: 20%;">NAME</th>
+            <th  style="width: 8%;">COVER</th>
+            <th>Cost Price</th>
+            <th>MRP</th>
+            <th>Today's Sale</th>
+            
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- <div style="text-align: center;width: 100%;" *ngIf =loaderCart>
+          <h2>!!!  ADD PRODUCT  !!!</h2>
+          <img src="assets/wine.gif" style="width:15%;" />
+        </div> -->
+          
+          <tr  *ngFor="let item of snacksItems; let i = index" [style.background-color]="item.highlight ? 'rgb(187 237 252)' : null" >
+            <td>{{i+1}}</td>
+            <td style="width: 15%;">{{item.barCode}}</td>
+            <td style="width: 20%;">{{item.brandName}}</td>
+            <td style="width: 8%;" *ngIf ="item.defined == 1">Yes</td>
+            <td style="width: 8%;" *ngIf ="item.defined == 0">No</td>
+            <td>{{item.singleBottelPrice}}</td>
+            <td>{{item.unitPrice}}</td>
+            <td>{{item.totalSale}}</td>
+           
+            
+            <td> <img  src="assets/multiply.png" style="padding-right:5px;" (click)="deleteSnackProduct(item)"></td>
+             
+          </tr>
+         
+        </tbody>
+      </table>
+</div>

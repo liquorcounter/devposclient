@@ -1,0 +1,29 @@
+
+<div class="main">
+<div class="wrapper fadeInDown" >
+    <div id="formContent">
+      <!-- Tabs Titles -->
+  
+      <!-- Icon -->
+      <div class="fadeIn first">
+        <h4 style="padding: 15px;font-size: 1.5em;">LC - POS</h4>
+        
+      </div>
+  
+      <!-- Login Form -->
+      <form (ngSubmit)="onSubmit();" ngNativeValidate>
+        <label>TERMINAL ID</label>
+        <input type="number" id="login" class="fadeIn second" name="name" placeholder="Terminal Name"  [(ngModel)]= "name" required >
+        <label>CONNECT IP</label>
+        <input type="text" id="ip" class="fadeIn third" name="ip" placeholder="Connect IP"  [(ngModel)]= "ip" required (change)="changeAlert('')" >
+        
+        <b style="display: block;color:red">{{alertText}}</b>
+        <input type="submit" class="fadeIn fourth" value="CONNECT" #connectBtn>
+      </form>
+  
+      
+  
+    </div>
+  </div>
+
+</div>

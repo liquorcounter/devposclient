@@ -1,0 +1,422 @@
+ <!-- <div class="modal-body" style="text-align: left;height: calc( 100vh - 25vh );
+overflow: auto;">
+    <div>
+     <div class="">
+        <p style="display: inline-block;">LIQUOR SALE</p>
+        <p style="float: right;">{{totalLiquorSale}}</p>
+     </div>
+     <div class="" >
+        <p style="display: inline-block;">SNACKS SALE</p>
+        <p style="float: right;">{{totalSnacksSale}}</p>
+     </div>
+     <div class="" style="border-top: 2px #000 solid;border-bottom: 2px #000 solid;padding: 5px;">
+        <b >TOTAL SALE</b>
+        <b style="float: right;">{{totalLiquorSale + totalSnacksSale}}</b>
+     </div>
+     <div style="margin-top: 10px;">
+     <div >
+        <p style="display: inline-block;">CREDIT</p>
+        <p style="float: right;">{{totalCredit}}</p>
+     </div>
+     <div >
+        <p style="display: inline-block;">DISCOUNT</p>
+        <p style="float: right;">{{totalDiscount}}</p>
+     </div>
+     <div>
+        <p style="display: inline-block;">CARD - {{totalCard}}</p>
+        <input type="number" [(ngModel)]="counterCard" style="float: right;text-align: right;" (input)="onChangeCard()" >
+        
+     </div>
+     <div class="" >
+        <p style="display: inline-block;">COUNTER CASH - {{totalCash}} </p>
+      
+        <input type="number" [(ngModel)]="counterCash" style="float: right;text-align: right;" (input)="onChangeCash()" >
+     </div>
+    
+     <details>
+        <summary><div >
+            <p style="display: inline-block;">EXPENSES</p>
+            <p style="float: right;">{{totalExpenses}}</p>
+         </div></summary>
+         <div class="">
+            <form   (ngSubmit)= "saveCategory()" ngNativeValidate [formGroup]="expenseForm" class="row">
+                <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                  <label for="category">Category:</label>
+                  <select id="category" formControlName= "categoryControl" style="width: 100%;">
+                        <option [ngValue]="category" *ngFor="let category of expenseModal.expenseCategoryBean" >{{category.expenseName}}</option>
+                      </select>
+                </div>
+                <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                  <label for="amount">Amount:</label>
+                  <input type="number"  formControlName = "amount" required>
+                 
+                </div>
+                <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                        <label for="comment">Comment:</label>
+                        <textarea   formControlName = "comment" rows="1"></textarea>
+                       
+                      </div>
+                      <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                        <br>
+                        <button  type="submit"  >ADD</button>
+                      </div>
+                
+              
+                  
+              </form>
+              <br>
+              <table class="table">
+                <thead>
+                  <tr style="background: #337ab7;color:#fff;font-size: 12px;font-weight: normal;">
+                    <th style="width: 30%;">NAME</th>
+                    <th>AMOUNT</th>
+                    <th>DELETE</th>
+                   </tr>
+                </thead>
+                <tbody style="height: auto;">
+                  <tr  *ngFor="let item of expensesList; let i = index">
+                    <td style="width: 30%;">{{item.name}}</td>
+                    <td>{{item.amount}}</td>
+                    <td><img src="assets/multiply.png" style="padding-right:5px;" (click)="deleteExpense(i)"></td>
+                   </tr>
+                 
+                </tbody>
+              </table>
+         </div>
+      </details>
+
+      <div class="" style="border-top: 2px #000 solid;border-bottom: 2px #000 solid;padding: 5px;">
+        <b >TOTAL COUNTER</b>
+        <b style="float: right;">{{counterCard + counterCash + totalCredit + totalDiscount}}</b>
+     </div>
+    </div>
+  </div>
+  
+  </div>
+  <div class="modal-footer">
+    <button style="position: absolute;left: 5px;" type="button" class="btn btn-danger" >SUBMIT</button>
+      <b >SHORT : {{totalShort}}</b>
+  
+  </div>  -->
+  <div class="TABPOSPOPUP" *ngIf=!onlyPOS>
+  <mat-horizontal-stepper linear #stepper>
+    <mat-step  >
+      
+        <ng-template matStepLabel>INVOICE UPDATE</ng-template>
+        <hr>
+        <br>
+        <h3 class="modal-title" id="exampleModalLongTitle" style="color: red;" *ngIf=!invoiceUpdated>*OH!!!  Invoice Not Updated Today</h3>
+        <h3 class="modal-title" id="exampleModalLongTitle" style="color: green;"*ngIf=invoiceUpdated>*Great!!! Today Invoice Updated</h3>
+
+        <h3 *ngIf=!invoiceUpdated >Did you recieved Invoice Today?</h3>
+        <mat-radio-group aria-label="Select an option" *ngIf=!invoiceUpdated  [(ngModel)]="value">
+            <mat-radio-button [value]="true" style="margin-right: 30px;">YES</mat-radio-button>
+            <mat-radio-button [value]="false" >NO</mat-radio-button>
+          </mat-radio-group>
+          <br>
+          <b *ngIf=value >Please update Invoice and Close Counter</b>
+        <div>
+            
+          <button class="btn btn-primary"style="float: right;" [disabled]="value" mat-button matStepperNext>Next</button>
+        </div>
+      
+    </mat-step>
+    <mat-step >
+    
+        <ng-template matStepLabel>TAB ENTRY</ng-template>
+        <hr>
+        <br>
+        <h3>Do you want to continue with TAB SALE ENTRY?</h3>
+        <mat-radio-group aria-label="Select an option" [(ngModel)]="tabvalue">
+            <mat-radio-button [value]="true" style="margin-right: 30px;" >YES</mat-radio-button>
+            <mat-radio-button [value]="false">NO</mat-radio-button>
+          </mat-radio-group>
+        <div>
+          <button class="btn btn-primary" style="float: left;" mat-button matStepperPrevious>Back</button>
+          <button class="btn btn-primary" style="float: right;" matStepperNext (click)="updateSettings()">Next</button>
+        </div>
+      
+    </mat-step>
+    <mat-step>
+      <ng-template matStepLabel>CLOSING</ng-template>
+      <hr>
+      <br>
+      <h3 *ngIf=tabvalue>Start Entering TAB...</h3>
+      <div *ngIf=!tabvalue >
+        <div class="" style="text-align: left;">
+           <p style="display: inline-block;">LIQUOR SALE</p>
+           <p style="float: right;">{{totalLiquorSale}}</p>
+        </div>
+        <div class=""  style="text-align: left;">
+           <p style="display: inline-block;">SNACKS SALE</p>
+           <p style="float: right;">{{totalSnacksSale}}</p>
+        </div>
+        <div class="" style="border-top: 2px #000 solid;border-bottom: 2px #000 solid;padding: 5px;text-align: left;">
+           <b >TOTAL SALE</b>
+           <b style="float: right;">{{totalLiquorSale + totalSnacksSale}}</b>
+        </div>
+        <div style="margin-top: 10px;">
+        <div  style="text-align: left;">
+           <p style="display: inline-block;">CREDIT</p>
+           <p style="float: right;">{{totalCredit}}</p>
+        </div>
+        <div  style="text-align: left;">
+           <p style="display: inline-block;">DISCOUNT</p>
+           <p style="float: right;">{{totalDiscount}}</p>
+        </div>
+        <div  style="text-align: left;">
+            <p style="display: inline-block;">UPI - {{totalUPI}}</p>
+            <input type="number" [(ngModel)]="counterUPI" style="float: right;text-align: right;" (input)="getShort()" >
+         </div>
+        <div  style="text-align: left;">
+           <p style="display: inline-block;">CARD - {{totalCard}}</p>
+           <input type="number" [(ngModel)]="counterCard" style="float: right;text-align: right;" (input)="getShort()" >
+           
+        </div>
+        <div class=""  style="text-align: left;" >
+           <p style="display: inline-block;">COUNTER CASH - {{totalCash}} </p>
+         
+           <input type="number" [(ngModel)]="counterCash" style="float: right;text-align: right;" (input)="getShort()" >
+        </div>
+       
+        <details>
+           <summary><div  style="text-align: left;" >
+               <p style="display: inline-block;">EXPENSES</p>
+               <p style="float: right;">{{totalExpenses}}</p>
+            </div></summary>
+            <div class="">
+               <form   (ngSubmit)= "saveCategory()" ngNativeValidate [formGroup]="expenseForm" class="row">
+                   <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                     <label for="category">Category:</label>
+                     <select id="category" formControlName= "categoryControl" style="width: 100%;">
+                           <option [ngValue]="category" *ngFor="let category of expenseModal.expenseCategoryBean" >{{category.expenseName}}</option>
+                         </select>
+                   </div>
+                   <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                     <label for="amount">Amount:</label>
+                     <input type="number"  formControlName = "amount" required>
+                    
+                   </div>
+                   <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                           <label for="comment">Comment:</label>
+                           <textarea   formControlName = "comment" rows="1"></textarea>
+                          
+                         </div>
+                         <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                           <br>
+                           <button  type="submit"  >ADD</button>
+                         </div>
+                   
+                 
+                     
+                 </form>
+                 <br>
+                 <table class="table">
+                   <thead>
+                     <tr style="background: #337ab7;color:#fff;font-size: 12px;font-weight: normal;">
+                       <th style="width: 30%;">NAME</th>
+                       <th>AMOUNT</th>
+                       <th>DELETE</th>
+                      </tr>
+                   </thead>
+                   <tbody style="height: auto;">
+                     <tr  *ngFor="let item of expensesList; let i = index">
+                       <td style="width: 30%;">{{item.name}}</td>
+                       <td>{{item.amount}}</td>
+                       <td><img src="assets/multiply.png" style="padding-right:5px;" (click)="deleteExpense(i)"></td>
+                      </tr>
+                    
+                   </tbody>
+                 </table>
+            </div>
+         </details>
+   
+         <div class="" style="border-top: 2px #000 solid;border-bottom: 2px #000 solid;padding: 5px;text-align: left;">
+           <b >TOTAL COUNTER</b>
+           <b style="float: right;">{{counterCard + counterCash + totalCredit + totalDiscount + counterUPI}}</b>
+        </div>
+        </div>
+        <br>
+      <hr>
+      <br>
+      <button style="position: absolute;left: 5px;" type="button" class="btn btn-danger" (click)="closeCounter()" >SUBMIT</button>
+      <b style="float: right;">SHORT : {{totalShort}}</b>
+       </div>
+      <!-- <div>
+        <button class="btn btn-primary" mat-button matStepperPrevious>Back</button>
+        <button class="btn btn-primary" mat-button (click)="stepper.reset()">Reset</button>
+      </div> -->
+      
+    </mat-step>
+  </mat-horizontal-stepper>
+
+</div>
+<!-- For ONL POS STORES -->
+<div class="POSPOPUP" *ngIf=onlyPOS>
+
+    <mat-horizontal-stepper linear #stepper>
+        <mat-step  >
+          
+            <ng-template matStepLabel>INVOICE UPDATE</ng-template>
+            <hr>
+            <br>
+            <h3 class="modal-title" id="exampleModalLongTitle" style="color: red;" *ngIf=!invoiceUpdated>*OH!!!  Invoice Not Updated Today</h3>
+            <h3 class="modal-title" id="exampleModalLongTitle" style="color: green;"*ngIf=invoiceUpdated>*Great!!! Today Invoice Updated</h3>
+    
+            <h3 *ngIf=!invoiceUpdated >Did you recieved Invoice Today?</h3>
+            <mat-radio-group aria-label="Select an option" *ngIf=!invoiceUpdated  [(ngModel)]="value">
+                <mat-radio-button [value]="true" style="margin-right: 30px;">YES</mat-radio-button>
+                <mat-radio-button [value]="false" >NO</mat-radio-button>
+              </mat-radio-group>
+              <br>
+              <b *ngIf=value >Please update Invoice and Close Counter</b>
+            <div>
+                
+              <button class="btn btn-primary"style="float: right;" [disabled]="value" mat-button matStepperNext>Next</button>
+            </div>
+          
+        </mat-step>
+        <mat-step >
+        
+            <ng-template matStepLabel>EXPENSES</ng-template>
+            <hr>
+            <br>
+            
+                <div  style="text-align: left;" >
+                    <b style="display: inline-block;">ADD EXPENSES</b>
+                    <b style="float: right;">Total : {{totalExpenses}}</b>
+                 </div>
+                 <br>
+                 <div class="">
+                    <form   (ngSubmit)= "saveCategory()" ngNativeValidate [formGroup]="expenseForm" class="row">
+                        <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                          <label for="category">Category:</label>
+                          <select id="category" formControlName= "categoryControl" style="width: 100%;">
+                                <option [ngValue]="category" *ngFor="let category of expenseModal.expenseCategoryBean" >{{category.expenseName}}</option>
+                              </select>
+                        </div>
+                        <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                          <label for="amount">Amount:</label>
+                          <input type="number"  formControlName = "amount" required>
+                         
+                        </div>
+                        <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                <label for="comment">Comment:</label>
+                                <textarea   formControlName = "comment" rows="1"></textarea>
+                               
+                              </div>
+                              <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                <br>
+                                <button  type="submit"  >ADD</button>
+                              </div>
+                        
+                      
+                          
+                      </form>
+                      <br>
+                      <table class="table">
+                        <thead>
+                          <tr style="background: #337ab7;color:#fff;font-size: 12px;font-weight: normal;">
+                            <th style="width: 30%;">NAME</th>
+                            <th>AMOUNT</th>
+                            <th>DELETE</th>
+                           </tr>
+                        </thead>
+                        <tbody style="height: auto;">
+                          <tr  *ngFor="let item of expensesList; let i = index">
+                            <td style="width: 30%;">{{item.name}}</td>
+                            <td>{{item.amount}}</td>
+                            <td><img src="assets/multiply.png" style="padding-right:5px;" (click)="deleteExpense(i)"></td>
+                           </tr>
+                         
+                        </tbody>
+                      </table>
+                 </div>
+            
+            <div>
+                <br>
+                <hr>
+                <br>
+              <button class="btn btn-primary" style="float: left;" mat-button matStepperPrevious>Back</button>
+              <button class="btn btn-primary" style="float: right;" matStepperNext (click)="updateSettings()">Next</button>
+            </div>
+          
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>CLOSING</ng-template>
+          <hr>
+          <br>
+          
+          <div >
+            <div class="" style="text-align: left;">
+               <p style="display: inline-block;">LIQUOR SALE</p>
+               <p style="float: right;">{{totalLiquorSale}}</p>
+            </div>
+            <div class=""  style="text-align: left;">
+               <p style="display: inline-block;">SNACKS SALE</p>
+               <p style="float: right;">{{totalSnacksSale}}</p>
+            </div>
+            <div class="" style="border-top: 2px #000 solid;border-bottom: 2px #000 solid;padding: 5px;text-align: left;">
+               <b >TOTAL SALE</b>
+               <b style="float: right;">{{totalLiquorSale + totalSnacksSale}}</b>
+            </div>
+            <div style="margin-top: 10px;">
+                <div  style="text-align: left;">
+                    <p style="display: inline-block;">EXPENSES</p>
+                    <p style="float: right;">{{totalExpenses}}</p>
+                 </div>  
+                
+            <div  style="text-align: left;">
+               <p style="display: inline-block;">CREDIT</p>
+               <p style="float: right;">{{totalCredit}}</p>
+            </div>
+            <div  style="text-align: left;">
+               <p style="display: inline-block;">DISCOUNT</p>
+               <p style="float: right;">{{totalDiscount}}</p>
+            </div>
+            <div  style="text-align: left;">
+                <p style="display: inline-block;">UPI - {{totalUPI}}</p>
+                <input type="number" [(ngModel)]="counterUPI" style="float: right;text-align: right;" (input)="getShort()" >
+             </div> 
+            <div  style="text-align: left;">
+               <p style="display: inline-block;">CARD - {{totalCard }}</p>
+               <input type="number" [(ngModel)]="counterCard" style="float: right;text-align: right;" (input)="getShort()" >
+               
+            </div>
+            <div class=""  style="text-align: left;" >
+               <p style="display: inline-block;">COUNTER CASH - {{totalCash}} </p>
+             
+               <input type="number" [(ngModel)]="counterCash" style="float: right;text-align: right;" (input)="getShort()" >
+            </div>
+           
+           
+       
+             <div class="" style="border-top: 2px #000 solid;border-bottom: 2px #000 solid;padding: 5px;text-align: left;">
+               <b >TOTAL COUNTER</b>
+               <b style="float: right;">{{counterCard + counterCash + totalCredit + totalDiscount + counterUPI}}</b>
+            </div>
+            </div>
+            <br>
+            <b style="float: right;">SHORT : {{indianRupeeFormat(totalShort)}}</b>
+            <br>
+          <hr>
+          <br>
+          <button class="btn btn-primary" style="float: left;" mat-button matStepperPrevious>Back</button>
+          <button style="float: right;" type="button" class="btn btn-danger" (click)="closeCounter()">SUBMIT</button>
+         
+           </div>
+          <!-- <div>
+            <button class="btn btn-primary" mat-button matStepperPrevious>Back</button>
+            <button class="btn btn-primary" mat-button (click)="stepper.reset()">Reset</button>
+          </div> -->
+          
+        </mat-step>
+      </mat-horizontal-stepper>
+
+    </div>
+
+     <!-- loading Modal -->
+<div class="loadingmodal" *ngIf=showLoader>
+    <h2>{{alertText}}</h2>
+    
+    </div>
